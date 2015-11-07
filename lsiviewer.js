@@ -1,7 +1,7 @@
 /* Author: Manikanta, K S Rajan */
 
 /**
- * lsiviewer.js : This file has the methods that controls the canvas and adds styling.
+ * lsiviewer.js : This file has the methods that controls the canvas and adds styling to it.
  * load(function) : 
  *		loads geojson
  *		create canvas and add event listeners  
