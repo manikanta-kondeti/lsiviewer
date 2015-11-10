@@ -537,7 +537,7 @@ var MouseMove = function(evt){
 	  lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
 	  lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
 	  dragged = true;
-	  if (dragStart.length!=0){
+	  if (dragStart !== null){
 		 var pt = [lastX,lastY];
 		 console.log(pt[0]);
 		 console.log(dragStart[0])
