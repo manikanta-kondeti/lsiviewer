@@ -49,7 +49,9 @@ function load(response){
 	 canvas.addEventListener('mousedown',MouseDown, false);
 	 canvas.addEventListener('mouseup',MouseUp, false);
 	 canvas.addEventListener('mousemove',MouseMove, false);
+	 // Firefox: Have different function for handling scroll 
 	 canvas.addEventListener('DOMMouseScroll',handleScroll, false);
+	 // Chrome, Safari, IE6: 
 	 canvas.addEventListener('mousewheel',handleScroll, false);
 	 initJson(geojson);
 
@@ -339,11 +341,11 @@ function _equalPosition(){
 
 function _zoomIn(){
 		  scaleCount *= 1.2;
-		  if(flagZoom !=0){
+		  if(flagZoom != 0){
 				flagZoom -= 1;
 				draw(geojson.features, 'draw');
 		  } else {
-				flagZoom=0;
+				flagZoom = 0;
 				_zoomX = (canvasWidth/2);
 				_zoomY = (canvasHeight/2);
 				draw(geojson.features, 'draw');
@@ -352,11 +354,11 @@ function _zoomIn(){
 function _zoomOut()
 {
 		  scaleCount /= 1.2;
-		  if(flagZoom!=0){
+		  if(flagZoom != 0){
 				flagZoom -= 1;
 				draw(geojson.features, 'draw');
 		  } else {
-				flagZoom=0;
+				flagZoom = 0;
 				_zoomX=(canvasWidth/2);
 				_zoomY=(canvasHeight/2);
 				draw(geojson.features, 'draw');
@@ -438,22 +440,22 @@ function _strokeColorChange(){
 
 //Pen width 
 function _penIncrease(){
-		  console.log("pen Increase called");
-		  _penWidth += 0.15;
-		  if(_penWidth>=3){
-				_penWidth = 3;
-		  }
-		  draw(geojson.features, 'draw');
+	console.log("pen Increase called");
+	_penWidth += 0.15;
+	if(_penWidth>=3){
+		_penWidth = 3;
+	}
+	draw(geojson.features, 'draw');
 }
 
 
 function _penDecrease(){
-		  _penWidth -= 0.1;
-		  if (_penWidth<=0.01){
-				_penWidth = 0.01;
-		  }
-		  draw(geojson.features, 'draw');
-		  console.log("Decrease Called");
+	_penWidth -= 0.1;
+	if (_penWidth<=0.01) {
+		_penWidth = 0.01;
+	}
+	draw(geojson.features, 'draw');
+	console.log("Decrease Called");
 }
 
 /** 
@@ -461,6 +463,7 @@ function _penDecrease(){
  * Labels
  *
  */
+
 function labelToggle(){
 		  var labelButton = document.getElementById("label").value;
 		  if(labelButton != "None"){
@@ -476,6 +479,7 @@ function labelToggle(){
 			 labelFlag = 0;
 			 draw(geojson.features,'draw');
 		  }
+		  document.getElementById("label").value = labelButton;
 }
 
 /**
@@ -512,9 +516,7 @@ function dialog1() {
 	}
 }
 
-
 /*End of Styling params */
-
 
 /**
  *  Mouse Controls 
@@ -528,19 +530,21 @@ var MouseDown = function(evt){
 	  document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
 	  lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
 	  lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
+	  console.log("lastX = "+lastX + "lastY = "+lastY);
 	  dragStart = [lastX,lastY];
 	  dragged = false;
 }
 
 var MouseMove = function(evt){
 	  console.log("In mouse move");
+	  console.log("After mm");
 	  lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
 	  lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
 	  dragged = true;
 	  if (dragStart !== null){
 		 var pt = [lastX,lastY];
-		 console.log(pt[0]);
-		 console.log(dragStart[0])
+		 console.log(" mm pt[0] = " + pt[0]);
+		 console.log("dragStart[0] = " + dragStart[0])
 		 _moveX = pt[0]-dragStart[0];
 		 _moveY = pt[1]-dragStart[1];
 		 draw(geojson.features,'draw');
@@ -554,15 +558,16 @@ var MouseUp = function(evt){
 }
 
 var scaleFactor = 1.1;
+var zoomClicks = 0;
 
 var zoom = function(clicks){
 		  var pt = [lastX,lastY];
 		  _zoomX = lastX;
 		  _zoomY = lastY;
+		  console.log("scaleFactor = " + scaleFactor + " clicks = " + clicks);
 		  var factor = Math.pow(scaleFactor,clicks);
 		  scaleCount = factor;
-		  console.log("clicks = "+clicks+ " factor = "+factor);
-		  console.log("zoomX = "+_zoomX+ " zoomY = "+_zoomY);
+
 		  /*	context.translate(pt.x,pt.y);
 				var factor = Math.pow(scaleFactor,clicks);
 				context.scale(factor,factor);
@@ -570,13 +575,32 @@ var zoom = function(clicks){
 		  draw(geojson.features,'draw');
 }
 
-var handleScroll = function(evt){
+function handleScroll(e) {
+
+	// cross-browser wheel delta
+	var e = window.event || e; // old IE support
+	var delta = (e.wheelDelta/60 || -e.detail/2);
+	console.log("delta in handleScroll = " + delta);
+	if (delta > 1 && delta != 0) {
+		zoomClicks += 1;
+		_zoomIn();
+	}
+	else if (delta < -1 && delta != 0) {
+		zoomClicks -= 1;
+		_zoomOut();
+	}
+	return false;
+
+}
+var handleScroll1 = function(evt){
 		  console.log("Scroll");
 		  console.log(evt);
 		  var delta = evt.wheelDelta ? evt.wheelDelta/4 : evt.detail ? -evt.detail : 0;
 		  console.log("delta " + delta);
 		  console.log("wheel " + evt.wheelDelta);
-		  if (delta) zoom(delta);
+		  if (delta) {
+		  	zoom(delta);
+		  }
 		  return evt.preventDefault() && false;
 };
 
@@ -604,7 +628,7 @@ $(document).ready(function(){
 	$("#label_color").spectrum({
 		color: "#f00",
 		showButtons: false,
-		move:function(color) {
+		move: function(color) {
 			_labelColor = $('#label_color').spectrum('get').toHexString(); 
 			draw(geojson.features, 'draw');
 		}
