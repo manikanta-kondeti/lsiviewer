@@ -18,7 +18,7 @@ var _zoomX = canvasWidth / 2,
     _zoomY = canvasHeight / 2,
     _moveX = 0,
     _moveY = 0,
-    _labelWidth = 4,
+    _labelWidth = 10,
     _labelColor = "#1c1313",
     _penWidth = 1,
     _fillColor = "#c9baba",
@@ -456,6 +456,27 @@ function _penDecrease() {
     console.log("Decrease Called");
 }
 
+/**
+ * Export data as png, jpg
+ */
+function _export() {
+    _export_type = document.getElementById('export').value;
+    console.log(_export_type);
+    var img;
+    var a = document.getElementById('download_link');
+    if (_export_type == "PNG") {
+        img = canvas.toDataURL("image/png");
+        a.download = "map.png";
+    }
+    else if (_export_type == "JPG") {
+        img = canvas.toDataURL("image/jpg");
+        a.download = "map.jpg";
+    }
+    
+    a.href = img;
+    a.click();
+}
+
 /** 
  *
  * Labels
@@ -525,7 +546,7 @@ var dragStart = [],
     dragged = false;
 
 var MouseDown = function(evt) {
-    console.log("In mouse down");
+    //console.log("In mouse down");
     document.body.style.mozUserSelect = document.body.style.webkitUserSelect = document.body.style.userSelect = 'none';
     lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
     lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
@@ -535,8 +556,7 @@ var MouseDown = function(evt) {
 }
 
 var MouseMove = function(evt) {
-    console.log("In mouse move");
-    console.log("After mm");
+    //console.log("In mouse move");
     lastX = evt.offsetX || (evt.pageX - canvas.offsetLeft);
     lastY = evt.offsetY || (evt.pageY - canvas.offsetTop);
     dragged = true;
@@ -552,7 +572,7 @@ var MouseMove = function(evt) {
 
 var MouseUp = function(evt) {
     dragged = false;
-    console.log("In mouse up");
+    //console.log("In mouse up");
     dragStart = null;
 }
 
@@ -563,7 +583,7 @@ var zoom = function(clicks) {
     var pt = [lastX, lastY];
     _zoomX = lastX;
     _zoomY = lastY;
-    console.log("scaleFactor = " + scaleFactor + " clicks = " + clicks);
+    //console.log("scaleFactor = " + scaleFactor + " clicks = " + clicks);
     var factor = Math.pow(scaleFactor, clicks);
     scaleCount = factor;
 
@@ -578,7 +598,7 @@ function handleScroll(e) {
 
     // cross-browser wheel delta
     var e = window.event || e; // old IE support
-    var delta = (e.wheelDelta / 120 || -e.detail / 2);
+    var delta = (e.wheelDelta / 40 || -e.detail / 2);
     console.log("delta in handleScroll = " + delta);
     if (delta > 1 && delta != 0) {
         zoomClicks += 1;
